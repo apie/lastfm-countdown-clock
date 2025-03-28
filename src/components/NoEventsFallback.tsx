@@ -21,11 +21,11 @@ export default function NoEventsFallback({ username }: NoEventsFallbackProps) {
           <Music className="h-20 w-20 text-lastfm-red" />
           <p className="text-muted-foreground">
             {username 
-              ? `${username} doesn't have any upcoming events on Last.fm.` 
+              ? `${username} doesn't have any upcoming events on their Last.fm profile.` 
               : 'Enter your Last.fm username to find upcoming events.'}
           </p>
           <p className="text-sm text-muted-foreground">
-            Make sure you have events scheduled and your profile is public.
+            Make sure your profile is public and you're going to events on Last.fm.
           </p>
         </div>
       </CardContent>
