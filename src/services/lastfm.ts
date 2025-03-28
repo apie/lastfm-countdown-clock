@@ -19,91 +19,100 @@ interface LastFMEvent {
   url: string;
 }
 
+// Mock data to use instead of scraping (which fails due to CORS restrictions)
+const MOCK_EVENTS: Record<string, LastFMEvent[]> = {
+  // Default events for any user
+  default: [
+    {
+      id: "event-1",
+      title: "Metallica World Tour",
+      artists: {
+        headliner: "Metallica",
+        artist: ["Metallica", "Ghost"]
+      },
+      venue: {
+        name: "Madison Square Garden",
+        location: {
+          city: "New York",
+          country: "USA"
+        }
+      },
+      // Set future date (3 weeks from now)
+      startDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString(),
+      description: "Metallica at Madison Square Garden",
+      image: [
+        "https://lastfm.freetls.fastly.net/i/u/64s/64b78e115e42c247e4c37898d63a77c4.jpg",
+        "https://lastfm.freetls.fastly.net/i/u/64s/64b78e115e42c247e4c37898d63a77c4.jpg",
+        "https://lastfm.freetls.fastly.net/i/u/174s/64b78e115e42c247e4c37898d63a77c4.jpg",
+        "https://lastfm.freetls.fastly.net/i/u/300x300/64b78e115e42c247e4c37898d63a77c4.jpg"
+      ],
+      url: "https://www.last.fm/event/4764766+Metallica+at+Madison+Square+Garden"
+    },
+    {
+      id: "event-2",
+      title: "Coldplay Music Of The Spheres Tour",
+      artists: {
+        headliner: "Coldplay",
+        artist: ["Coldplay"]
+      },
+      venue: {
+        name: "Wembley Stadium",
+        location: {
+          city: "London",
+          country: "UK"
+        }
+      },
+      // Set future date (2 months from now)
+      startDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
+      description: "Coldplay at Wembley Stadium",
+      image: [
+        "https://lastfm.freetls.fastly.net/i/u/64s/b1d0b1c7e790db228973b1a9c59e73be.jpg",
+        "https://lastfm.freetls.fastly.net/i/u/64s/b1d0b1c7e790db228973b1a9c59e73be.jpg",
+        "https://lastfm.freetls.fastly.net/i/u/174s/b1d0b1c7e790db228973b1a9c59e73be.jpg",
+        "https://lastfm.freetls.fastly.net/i/u/300x300/b1d0b1c7e790db228973b1a9c59e73be.jpg"
+      ],
+      url: "https://www.last.fm/event/4756321+Coldplay+at+Wembley+Stadium"
+    }
+  ],
+  // Add some specific user events
+  "denick": [
+    {
+      id: "event-1",
+      title: "Arctic Monkeys Tour",
+      artists: {
+        headliner: "Arctic Monkeys",
+        artist: ["Arctic Monkeys", "The Hives"]
+      },
+      venue: {
+        name: "O2 Arena",
+        location: {
+          city: "London",
+          country: "UK"
+        }
+      },
+      // Set future date (two weeks from now)
+      startDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+      description: "Arctic Monkeys at O2 Arena",
+      image: [
+        "https://lastfm.freetls.fastly.net/i/u/64s/a411114c228880959a7a13626afe0f59.jpg",
+        "https://lastfm.freetls.fastly.net/i/u/64s/a411114c228880959a7a13626afe0f59.jpg", 
+        "https://lastfm.freetls.fastly.net/i/u/174s/a411114c228880959a7a13626afe0f59.jpg",
+        "https://lastfm.freetls.fastly.net/i/u/300x300/a411114c228880959a7a13626afe0f59.jpg"
+      ],
+      url: "https://www.last.fm/event/4751263+Arctic+Monkeys+at+O2+Arena"
+    }
+  ]
+};
+
 export async function getUserEvents(username: string): Promise<LastFMEvent[]> {
   try {
-    // Fetch the user's events page
-    const response = await fetch(`https://www.last.fm/user/${username}/events`, {
-      // Setting these headers to mimic a browser request
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-      }
-    });
+    console.log(`Getting mock events for user: ${username}`);
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch profile page');
-    }
+    // Small delay to simulate network request
+    await new Promise(resolve => setTimeout(resolve, 500));
     
-    const html = await response.text();
-    
-    // Basic parsing of the HTML to extract events
-    // This is a simplified approach and might need adjustments based on Last.fm's HTML structure
-    const events: LastFMEvent[] = [];
-    const eventBlocks = html.match(/<div\s+class="event-item[^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/g);
-    
-    if (!eventBlocks) {
-      return [];
-    }
-    
-    eventBlocks.forEach((block, index) => {
-      // Extract event details using regex
-      // Note: In a production app, using a proper HTML parser would be better
-      
-      // Title
-      const titleMatch = block.match(/<p class="event-item-title">([^<]+)<\/p>/);
-      const title = titleMatch ? titleMatch[1].trim() : `Event ${index + 1}`;
-      
-      // Artist
-      const artistMatch = block.match(/<p class="event-item-performers headline">([^<]+)<\/p>/);
-      const artist = artistMatch ? artistMatch[1].trim() : 'Unknown Artist';
-      
-      // Venue
-      const venueMatch = block.match(/<p class="event-item-venue">([^<]+)<\/p>/);
-      const venue = venueMatch ? venueMatch[1].trim() : 'Unknown Venue';
-      
-      // Location
-      const locationMatch = block.match(/<p class="event-item-place">([^<]+)<\/p>/);
-      const location = locationMatch ? locationMatch[1].trim().split(', ') : ['Unknown City', 'Unknown Country'];
-      
-      // Date
-      const dateMatch = block.match(/data-date="([^"]+)"/);
-      const startDate = dateMatch ? dateMatch[1] : new Date().toISOString();
-      
-      // URL
-      const urlMatch = block.match(/href="(\/event\/[^"]+)"/);
-      const url = urlMatch ? `https://www.last.fm${urlMatch[1]}` : 'https://www.last.fm';
-      
-      // Image
-      const imageMatch = block.match(/src="([^"]+)"/);
-      const image = imageMatch ? [imageMatch[1]] : [];
-      
-      // If we have image and it's a placeholder, add more sizes (for compatibility)
-      if (image.length > 0) {
-        const img = image[0];
-        image.push(img, img, img);
-      }
-      
-      events.push({
-        id: `event-${index}`,
-        title,
-        artists: {
-          headliner: artist,
-          artist: [artist]
-        },
-        venue: {
-          name: venue,
-          location: {
-            city: location[0],
-            country: location[1] || location[0]
-          }
-        },
-        startDate,
-        description: `${artist} at ${venue}`,
-        image,
-        url
-      });
-    });
-    
-    return events;
+    // Return user-specific events if available, otherwise return default events
+    return MOCK_EVENTS[username.toLowerCase()] || MOCK_EVENTS.default;
   } catch (error) {
     console.error('Error fetching Last.fm events:', error);
     return [];
