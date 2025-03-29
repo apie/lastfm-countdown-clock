@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -18,20 +18,31 @@ const Index = () => {
   const [inputUsername, setInputUsername] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [nextEvent, setNextEvent] = useState<any>(null);
+  const [allEvents, setAllEvents] = useState<any[]>([]);
 
   const fetchEvents = async (user: string) => {
     setLoading(true);
     try {
+      console.log(`Fetching events for username: ${user}`);
       const events = await getUserEvents(user);
+      console.log('Events fetched from API:', events);
+      console.log(`Total events found: ${events.length}`);
+      
+      setAllEvents(events);
+      
       const next = getNextEvent(events);
+      console.log('Next event calculated:', next);
       setNextEvent(next);
       
       if (!next) {
+        console.log('No next event found, showing toast notification');
         toast({
           title: "No upcoming events found",
           description: "We couldn't find any upcoming events for this username.",
           variant: "destructive"
         });
+      } else {
+        console.log('Next event found:', next.title, 'on', new Date(next.startDate).toLocaleDateString());
       }
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -67,6 +78,26 @@ const Index = () => {
       fetchEvents(username);
     }
   }, []);
+
+  // Debug section showing all fetched events
+  const debugContent = (
+    <div className="mt-8 p-4 border border-dashed border-lastfm-red rounded-md">
+      <h3 className="text-lg font-semibold mb-2">Debug: All Events ({allEvents.length})</h3>
+      {allEvents.length > 0 ? (
+        <div className="space-y-2 max-h-60 overflow-auto">
+          {allEvents.map((event, idx) => (
+            <div key={idx} className="text-sm p-2 bg-background/50">
+              <p><strong>Title:</strong> {event.title}</p>
+              <p><strong>Date:</strong> {new Date(event.startDate).toLocaleString()}</p>
+              <p><strong>Artist:</strong> {event.artists.headliner}</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p>No events in array</p>
+      )}
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-lastfm-dark/20">
@@ -132,9 +163,16 @@ const Index = () => {
                 url={nextEvent.url}
               />
             </div>
+            
+            {/* Debug information */}
+            {debugContent}
           </div>
         ) : (
-          username && <NoEventsFallback username={username} />
+          <>
+            {username && <NoEventsFallback username={username} />}
+            {/* Show debug info even when no next event */}
+            {allEvents.length > 0 && debugContent}
+          </>
         )}
 
         <footer className="mt-20 text-center text-sm text-muted-foreground">
