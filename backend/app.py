@@ -4,6 +4,7 @@ from flask_cors import CORS
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
+from urllib.parse import quote
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -11,8 +12,11 @@ CORS(app)  # Enable CORS for all routes
 @app.route('/api/events/<username>', methods=['GET'])
 def get_user_events(username):
     try:
+        # URL encode the username properly using Python's built-in quote function
+        encoded_username = quote(username)
+        
         # Attempt to scrape Last.fm events for the given username
-        url = f"https://www.last.fm/user/{username}/events"
+        url = f"https://www.last.fm/user/{encoded_username}/events"
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         }
