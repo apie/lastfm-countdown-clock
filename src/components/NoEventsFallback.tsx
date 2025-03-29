@@ -25,7 +25,7 @@ export default function NoEventsFallback({ username }: NoEventsFallbackProps) {
               : 'Enter a Last.fm username to find upcoming events.'}
           </p>
           <p className="text-sm text-muted-foreground">
-            Note: This app uses a Flask backend to scrape Last.fm. Try username "denick" for custom events.
+            This app uses a Flask backend to scrape Last.fm for event information.
           </p>
         </div>
       </CardContent>

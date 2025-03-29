@@ -3,8 +3,6 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
 from bs4 import BeautifulSoup
-import json
-import re
 from datetime import datetime
 
 app = Flask(__name__)
@@ -13,37 +11,6 @@ CORS(app)  # Enable CORS for all routes
 @app.route('/api/events/<username>', methods=['GET'])
 def get_user_events(username):
     try:
-        # Mock data for the "denick" user
-        if username.lower() == "denick":
-            return jsonify({
-                "events": [
-                    {
-                        "id": "event-1",
-                        "title": "Arctic Monkeys Tour",
-                        "artists": {
-                            "headliner": "Arctic Monkeys",
-                            "artist": ["Arctic Monkeys", "The Hives"]
-                        },
-                        "venue": {
-                            "name": "O2 Arena",
-                            "location": {
-                                "city": "London",
-                                "country": "UK"
-                            }
-                        },
-                        "startDate": (datetime.now().timestamp() + 14 * 24 * 60 * 60) * 1000,
-                        "description": "Arctic Monkeys at O2 Arena",
-                        "image": [
-                            "https://lastfm.freetls.fastly.net/i/u/64s/a411114c228880959a7a13626afe0f59.jpg",
-                            "https://lastfm.freetls.fastly.net/i/u/64s/a411114c228880959a7a13626afe0f59.jpg", 
-                            "https://lastfm.freetls.fastly.net/i/u/174s/a411114c228880959a7a13626afe0f59.jpg",
-                            "https://lastfm.freetls.fastly.net/i/u/300x300/a411114c228880959a7a13626afe0f59.jpg"
-                        ],
-                        "url": "https://www.last.fm/event/4751263+Arctic+Monkeys+at+O2+Arena"
-                    }
-                ]
-            })
-        
         # Attempt to scrape Last.fm events for the given username
         url = f"https://www.last.fm/user/{username}/events"
         headers = {
@@ -62,59 +29,8 @@ def get_user_events(username):
         event_containers = soup.select('.events-list-item')
         
         if not event_containers:
-            # Default mock data if no events are found
-            return jsonify({
-                "events": [
-                    {
-                        "id": "event-1",
-                        "title": "Metallica World Tour",
-                        "artists": {
-                            "headliner": "Metallica",
-                            "artist": ["Metallica", "Ghost"]
-                        },
-                        "venue": {
-                            "name": "Madison Square Garden",
-                            "location": {
-                                "city": "New York",
-                                "country": "USA"
-                            }
-                        },
-                        "startDate": (datetime.now().timestamp() + 21 * 24 * 60 * 60) * 1000,
-                        "description": "Metallica at Madison Square Garden",
-                        "image": [
-                            "https://lastfm.freetls.fastly.net/i/u/64s/64b78e115e42c247e4c37898d63a77c4.jpg",
-                            "https://lastfm.freetls.fastly.net/i/u/64s/64b78e115e42c247e4c37898d63a77c4.jpg",
-                            "https://lastfm.freetls.fastly.net/i/u/174s/64b78e115e42c247e4c37898d63a77c4.jpg",
-                            "https://lastfm.freetls.fastly.net/i/u/300x300/64b78e115e42c247e4c37898d63a77c4.jpg"
-                        ],
-                        "url": "https://www.last.fm/event/4764766+Metallica+at+Madison+Square+Garden"
-                    },
-                    {
-                        "id": "event-2",
-                        "title": "Coldplay Music Of The Spheres Tour",
-                        "artists": {
-                            "headliner": "Coldplay",
-                            "artist": ["Coldplay"]
-                        },
-                        "venue": {
-                            "name": "Wembley Stadium",
-                            "location": {
-                                "city": "London",
-                                "country": "UK"
-                            }
-                        },
-                        "startDate": (datetime.now().timestamp() + 60 * 24 * 60 * 60) * 1000,
-                        "description": "Coldplay at Wembley Stadium",
-                        "image": [
-                            "https://lastfm.freetls.fastly.net/i/u/64s/b1d0b1c7e790db228973b1a9c59e73be.jpg",
-                            "https://lastfm.freetls.fastly.net/i/u/64s/b1d0b1c7e790db228973b1a9c59e73be.jpg",
-                            "https://lastfm.freetls.fastly.net/i/u/174s/b1d0b1c7e790db228973b1a9c59e73be.jpg",
-                            "https://lastfm.freetls.fastly.net/i/u/300x300/b1d0b1c7e790db228973b1a9c59e73be.jpg"
-                        ],
-                        "url": "https://www.last.fm/event/4756321+Coldplay+at+Wembley+Stadium"
-                    }
-                ]
-            })
+            # No events found
+            return jsonify({"events": []})
         
         # Parse each event
         events = []
@@ -152,9 +68,8 @@ def get_user_events(username):
                     date_obj = datetime.strptime(date_str, "%A %d %B %Y, %H:%M")
                     start_date = date_obj.timestamp() * 1000  # Convert to milliseconds
                 except Exception:
-                    # Fallback: use current time + random days in the future
-                    import random
-                    start_date = (datetime.now().timestamp() + random.randint(7, 90) * 24 * 60 * 60) * 1000
+                    # Fallback: use current time
+                    start_date = datetime.now().timestamp() * 1000
                 
                 # Get image
                 img_elem = container.select_one('.events-list-item-image img')
@@ -194,37 +109,6 @@ def get_user_events(username):
             except Exception as e:
                 print(f"Error parsing event: {str(e)}")
                 continue
-        
-        # If no events were successfully parsed, return default events
-        if not events:
-            return jsonify({
-                "events": [
-                    {
-                        "id": "event-1",
-                        "title": "Metallica World Tour",
-                        "artists": {
-                            "headliner": "Metallica",
-                            "artist": ["Metallica", "Ghost"]
-                        },
-                        "venue": {
-                            "name": "Madison Square Garden",
-                            "location": {
-                                "city": "New York",
-                                "country": "USA"
-                            }
-                        },
-                        "startDate": (datetime.now().timestamp() + 21 * 24 * 60 * 60) * 1000,
-                        "description": "Metallica at Madison Square Garden",
-                        "image": [
-                            "https://lastfm.freetls.fastly.net/i/u/64s/64b78e115e42c247e4c37898d63a77c4.jpg",
-                            "https://lastfm.freetls.fastly.net/i/u/64s/64b78e115e42c247e4c37898d63a77c4.jpg",
-                            "https://lastfm.freetls.fastly.net/i/u/174s/64b78e115e42c247e4c37898d63a77c4.jpg",
-                            "https://lastfm.freetls.fastly.net/i/u/300x300/64b78e115e42c247e4c37898d63a77c4.jpg"
-                        ],
-                        "url": "https://www.last.fm/event/4764766+Metallica+at+Madison+Square+Garden"
-                    }
-                ]
-            })
         
         return jsonify({"events": events})
     
