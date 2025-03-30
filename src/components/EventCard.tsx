@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar, Clock, MapPin, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -56,17 +57,31 @@ export default function EventCard({
         </div>
       </div>
       
-      <CardHeader>
-        <CardTitle className="text-2xl">{title}</CardTitle>
-        {artist && artist !== "Unknown Artist" && (
-          <CardDescription className="text-lg font-medium text-lastfm-red mt-1">
-            {artist}
+      <CardHeader className="flex flex-row items-start gap-4">
+        <div className="flex-1">
+          <CardTitle className="text-2xl">{title}</CardTitle>
+          {artist && artist !== "Unknown Artist" && (
+            <CardDescription className="text-lg font-medium text-lastfm-red mt-1">
+              {artist}
+            </CardDescription>
+          )}
+          <CardDescription className="flex items-center gap-2 mt-1">
+            <MapPin size={16} className="text-lastfm-red" />
+            <span>{venue}, {location}</span>
           </CardDescription>
+        </div>
+        
+        {artist && artist !== "Unknown Artist" && (
+          <Avatar className="h-12 w-12">
+            <AvatarImage 
+              src={imageUrl || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"} 
+              alt={artist} 
+            />
+            <AvatarFallback className="bg-lastfm-red text-white">
+              {artist.substring(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
         )}
-        <CardDescription className="flex items-center gap-2 mt-1">
-          <MapPin size={16} className="text-lastfm-red" />
-          <span>{venue}, {location}</span>
-        </CardDescription>
       </CardHeader>
       
       <CardContent className="space-y-2">
