@@ -159,7 +159,7 @@ const Index = () => {
                 venue={nextEvent.venue.name}
                 location={`${nextEvent.venue.location.city}, ${nextEvent.venue.location.country}`}
                 date={nextEvent.startDate}
-                imageUrl={nextEvent.image && nextEvent.image.length > 3 ? nextEvent.image[3]['#text'] : undefined}
+                imageUrl={nextEvent.artistImage}
                 url={nextEvent.url}
               />
             </div>

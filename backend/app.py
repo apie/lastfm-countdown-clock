@@ -33,23 +33,13 @@ def get_artist_image(artist_name):
         logger.debug(f"Fetching artist image from: {artist_url}")
         
         r = session.get(artist_url)
-        avatar_container = r.html.find(".header-new-avatar", first=True)
+        avatar_container = r.html.find(".header-new-background-image", first=True)
         
         if avatar_container:
-            img_tag = avatar_container.find("img", first=True)
-            if img_tag:
-                image_url = img_tag.attrs.get("src", "")
-                logger.debug(f"Found artist image: {image_url}")
-                return image_url
-        
-        # Try alternative selector if the first one fails
-        avatar = r.html.find(".avatar", first=True)
-        if avatar:
-            img_tag = avatar.find("img", first=True)
-            if img_tag:
-                image_url = img_tag.attrs.get("src", "")
-                logger.debug(f"Found artist image (alt method): {image_url}")
-                return image_url
+            image_url = avatar_container.attrs.get("content", "")
+            logger.debug(f"Found artist image: {image_url}")
+            return image_url
+     
                 
         logger.debug(f"No artist image found for {artist_name}")
         return ""
@@ -111,9 +101,12 @@ def get_events(username: str, year: str = ""):
                 main_artist = ""
                 if " - " in title:
                     main_artist = title.split(" - ")[0].strip()
-                else:
+                elif lineup:
                     # Try to extract from lineup
-                    main_artist = lineup.split(",")[0].strip() if lineup else "Unknown Artist"
+                    main_artist = lineup.split(",")[0].strip()
+                else:
+                    # Just use title
+                    main_artist = title
                 
                 # Get the artist's image from their Last.fm page
                 artist_image_url = get_artist_image(main_artist)

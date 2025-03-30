@@ -47,7 +47,7 @@ export default function EventCard({
           <img
             src={imageUrl}
             alt={title}
-            className="w-full h-48 object-cover"
+            className="w-full h-48 object-contain"
           />
         ) : (
           <div className="w-full h-48 bg-gradient-to-r from-lastfm-dark to-lastfm-red flex items-center justify-center">
