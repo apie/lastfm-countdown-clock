@@ -52,12 +52,17 @@ export default function EventCard({
           </div>
         )}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-          <h3 className="text-white font-bold text-xl">{artist}</h3>
+          <h3 className="text-white font-bold text-xl">{title}</h3>
         </div>
       </div>
       
       <CardHeader>
         <CardTitle className="text-2xl">{title}</CardTitle>
+        {artist && artist !== "Unknown Artist" && (
+          <CardDescription className="text-lg font-medium text-lastfm-red mt-1">
+            {artist}
+          </CardDescription>
+        )}
         <CardDescription className="flex items-center gap-2 mt-1">
           <MapPin size={16} className="text-lastfm-red" />
           <span>{venue}, {location}</span>
