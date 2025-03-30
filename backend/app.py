@@ -20,6 +20,43 @@ session = HTMLSession()
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
+def get_artist_image(artist_name):
+    """
+    Scrape the artist's image from their Last.fm page.
+    """
+    if not artist_name or artist_name == "Unknown Artist":
+        return ""
+    
+    try:
+        encoded_artist = quote(artist_name)
+        artist_url = f"https://www.last.fm/music/{encoded_artist}"
+        logger.debug(f"Fetching artist image from: {artist_url}")
+        
+        r = session.get(artist_url)
+        avatar_container = r.html.find(".header-new-avatar", first=True)
+        
+        if avatar_container:
+            img_tag = avatar_container.find("img", first=True)
+            if img_tag:
+                image_url = img_tag.attrs.get("src", "")
+                logger.debug(f"Found artist image: {image_url}")
+                return image_url
+        
+        # Try alternative selector if the first one fails
+        avatar = r.html.find(".avatar", first=True)
+        if avatar:
+            img_tag = avatar.find("img", first=True)
+            if img_tag:
+                image_url = img_tag.attrs.get("src", "")
+                logger.debug(f"Found artist image (alt method): {image_url}")
+                return image_url
+                
+        logger.debug(f"No artist image found for {artist_name}")
+        return ""
+    except Exception as e:
+        logger.error(f"Error fetching artist image for {artist_name}: {str(e)}")
+        return ""
+
 def get_events(username: str, year: str = ""):
     """
     Scrape events for a Last.fm user for a specific year or upcoming events.
@@ -78,6 +115,9 @@ def get_events(username: str, year: str = ""):
                     # Try to extract from lineup
                     main_artist = lineup.split(",")[0].strip() if lineup else "Unknown Artist"
                 
+                # Get the artist's image from their Last.fm page
+                artist_image_url = get_artist_image(main_artist)
+                
                 # Create standardized event object
                 event_data = {
                     "id": str(uuid.uuid4()),
@@ -101,6 +141,7 @@ def get_events(username: str, year: str = ""):
                         {"#text": image_url, "size": "large"},
                         {"#text": image_url, "size": "extralarge"}
                     ],
+                    "artistImage": artist_image_url,  # New field for artist image
                     "url": link
                 }
                 

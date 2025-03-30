@@ -19,6 +19,7 @@ interface LastFMEvent {
     '#text': string;
     size: string;
   }> | string[];
+  artistImage?: string;
   url: string;
 }
 

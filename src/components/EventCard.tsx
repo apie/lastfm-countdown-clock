@@ -13,6 +13,7 @@ interface EventCardProps {
   location: string;
   date: string;
   imageUrl?: string;
+  artistImageUrl?: string;
   url: string;
 }
 
@@ -23,6 +24,7 @@ export default function EventCard({
   location,
   date,
   imageUrl,
+  artistImageUrl,
   url
 }: EventCardProps) {
   const eventDate = new Date(date);
@@ -74,7 +76,7 @@ export default function EventCard({
         {artist && artist !== "Unknown Artist" && (
           <Avatar className="h-12 w-12">
             <AvatarImage 
-              src={imageUrl || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"} 
+              src={artistImageUrl || imageUrl || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"} 
               alt={artist} 
             />
             <AvatarFallback className="bg-lastfm-red text-white">
