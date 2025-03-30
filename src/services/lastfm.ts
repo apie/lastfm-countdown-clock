@@ -51,14 +51,8 @@ export async function getUserEvents(username: string): Promise<LastFMEvent[]> {
       return [];
     }
     
-    // Process events to ensure they have the correct format
-    const processedEvents = data.events.map((event: any) => ({
-      ...event,
-      // Ensure startDate is a string (ISO format)
-      startDate: typeof event.startDate === 'number' 
-        ? new Date(event.startDate).toISOString() 
-        : event.startDate
-    }));
+    // The backend now returns ISO date strings, so no conversion needed
+    const processedEvents = data.events;
     
     console.log(`Processed ${processedEvents.length} events`);
     return processedEvents;
