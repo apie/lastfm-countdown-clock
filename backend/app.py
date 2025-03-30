@@ -8,6 +8,7 @@ from urllib.parse import quote
 import logging
 import uuid
 from requests_html import HTMLSession
+from functools import cache
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, 
@@ -20,6 +21,7 @@ session = HTMLSession()
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
+@cache
 def get_artist_image(artist_name):
     """
     Scrape the artist's image from their Last.fm page.
