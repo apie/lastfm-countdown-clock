@@ -79,26 +79,6 @@ const Index = () => {
     }
   }, []);
 
-  // Debug section showing all fetched events
-  const debugContent = (
-    <div className="mt-8 p-4 border border-dashed border-lastfm-red rounded-md">
-      <h3 className="text-lg font-semibold mb-2">Debug: All Events ({allEvents.length})</h3>
-      {allEvents.length > 0 ? (
-        <div className="space-y-2 max-h-60 overflow-auto">
-          {allEvents.map((event, idx) => (
-            <div key={idx} className="text-sm p-2 bg-background/50">
-              <p><strong>Title:</strong> {event.title}</p>
-              <p><strong>Date:</strong> {new Date(event.startDate).toLocaleString()}</p>
-              <p><strong>Artist:</strong> {event.artists.headliner}</p>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p>No events in array</p>
-      )}
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-lastfm-dark/20">
       <div className="container mx-auto px-4 py-8">
@@ -156,27 +136,24 @@ const Index = () => {
                 id={nextEvent.id}
                 title={nextEvent.title}
                 artist={nextEvent.artists.headliner}
+                artists={nextEvent.artists.artist}
                 venue={nextEvent.venue.name}
-                location={`${nextEvent.venue.location.city}, ${nextEvent.venue.location.country}`}
+                location={nextEvent.venue.location.city}
                 date={nextEvent.startDate}
                 imageUrl={nextEvent.artistImage}
                 url={nextEvent.url}
               />
             </div>
             
-            {/* Debug information */}
-            {debugContent}
           </div>
         ) : (
           <>
             {username && <NoEventsFallback username={username} />}
-            {/* Show debug info even when no next event */}
-            {allEvents.length > 0 && debugContent}
           </>
         )}
 
         <footer className="mt-20 text-center text-sm text-muted-foreground">
-          <p>Data provided by the Last.fm API</p>
+          <p>Data provided by Last.fm</p>
           <p className="mt-1">This website is not affiliated with Last.fm</p>
         </footer>
       </div>

@@ -9,6 +9,7 @@ interface EventCardProps {
   id: string;
   title: string;
   artist: string;
+  artists: string[];
   venue: string;
   location: string;
   date: string;
@@ -20,6 +21,7 @@ interface EventCardProps {
 export default function EventCard({
   title,
   artist,
+  artists,
   venue,
   location,
   date,
@@ -55,18 +57,18 @@ export default function EventCard({
           </div>
         )}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-          <h3 className="text-white font-bold text-xl">{title}</h3>
+          {/* <h3 className="text-white font-bold text-xl">{title}</h3> */}
         </div>
       </div>
       
       <CardHeader className="flex flex-row items-start gap-4">
         <div className="flex-1">
           <CardTitle className="text-2xl">{title}</CardTitle>
-          {artist && artist !== "Unknown Artist" && (
-            <CardDescription className="text-lg font-medium text-lastfm-red mt-1">
-              {artist}
+          {artists[0] != title &&
+            <CardDescription className="flex items-center gap-2 mt-1">
+              <span>With <b>{artists.join(', ')}</b></span>
             </CardDescription>
-          )}
+          }
           <CardDescription className="flex items-center gap-2 mt-1">
             <MapPin size={16} className="text-lastfm-red" />
             <span>{venue}, {location}</span>
