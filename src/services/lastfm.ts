@@ -23,11 +23,12 @@ interface LastFMEvent {
   url: string;
 }
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 export async function getUserEvents(username: string): Promise<LastFMEvent[]> {
   try {
     console.log(`Fetching events for user: ${username}`);
+    console.log(`Using API base URL: ${API_BASE_URL}`);
     
     if (!username.trim()) {
       console.log('Empty username, returning empty array');

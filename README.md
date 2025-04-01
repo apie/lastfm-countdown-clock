@@ -1,8 +1,21 @@
+
 # Welcome to your Lovable project
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/2a4f9b2f-79c9-40fe-b3f7-dc1c2351d912
+
+## Environment Configuration
+
+This project uses environment variables to configure the API base URL. The following environment variables are available:
+
+- `VITE_API_BASE_URL`: The base URL of the API server.
+
+Two environment files are provided:
+- `.env.development`: Used during development with `npm run dev`.
+- `.env.production`: Used when building for production with `npm run build`.
+
+To customize these settings, create a copy of `.env.example` and modify the values as needed.
 
 ## How can I edit this code?
 
