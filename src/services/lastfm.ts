@@ -23,7 +23,7 @@ interface LastFMEvent {
   url: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export async function getUserEvents(username: string): Promise<LastFMEvent[]> {
   try {
