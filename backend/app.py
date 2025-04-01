@@ -178,4 +178,4 @@ def get_user_events(username):
 
 if __name__ == '__main__':
     logger.info("Starting Flask application")
-    app.run(debug=True, port=5000)
+    app.run(port=5000)
