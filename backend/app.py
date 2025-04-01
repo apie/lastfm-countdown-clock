@@ -67,8 +67,8 @@ def get_events(username: str, year: str = ""):
         logger.debug(f"Found {len(events)} events in the HTML")
         
         for i, event in enumerate(events):
-            if events_data:
-                return events_data # return as soon as we have one event
+            if len(events_data) > 1:
+                return events_data # return as soon as we have two events. (need more than one since we can have an event today!)
             try:
                 # Extract event data
                 datetimestr = event.find("time", first=True).attrs.get("datetime")
