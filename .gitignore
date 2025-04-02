@@ -24,6 +24,8 @@ dist-ssr
 *.sw?
 
 venv
+env
 debug.bash
 deploy.bash
 .env.production
+__pycache__/
