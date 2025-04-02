@@ -47,6 +47,26 @@ def get_artist_image(artist_name):
         logger.error(f"Error fetching artist image for {artist_name}: {str(e)}")
         return ""
 
+@cache
+def get_event_details(event_url: str):
+    if event_url.startswith('/'):
+        event_url = f"https://www.last.fm{event_url}"
+    logger.debug(f"Fetching event details from: {event_url}")
+
+    r = session.get(event_url)
+    date_element = r.html.find("p.qa-event-date span", first=True)
+    datetime_str = date_element.text
+    # This attr incorrectly always contains midnight as time, so try to get the time from the datetime_str if 'at' is in it.
+    datetime_attr = date_element.attrs.get('content')
+    if ' at ' in datetime_str:
+        _, time_str = datetime_str.split(' at ')
+        datetime_obj = datetime.strptime(datetime_attr[:10]+' '+time_str, '%Y-%m-%d %I:%M%p')
+    else:
+        datetime_obj = datetime.fromisoformat(datetime_attr)
+    return dict(
+        datetime_obj=datetime_obj
+    )
+
 def get_events(username: str, year: str = ""):
     """
     Scrape events for a Last.fm user for a specific year or upcoming events.
@@ -74,6 +94,7 @@ def get_events(username: str, year: str = ""):
                     "a.events-list-cover-link", first=True
                 ).attrs.get("href")
                 title = event.find(".events-list-item-event--title", first=True).text
+                event_url = event.find(".events-list-item-event--title a", first=True).attrs.get("href")
                 lineup = event.find(
                     ".events-list-item-event--lineup", first=True
                 ).text  # Does not include main act
@@ -88,7 +109,11 @@ def get_events(username: str, year: str = ""):
                 venue = city  # Default to city if we can't parse further
                 
                 # Parse the datetime
-                date_obj = datetime.fromisoformat(datetimestr)
+                # date_obj = datetime.fromisoformat(datetimestr)
+
+                # To get the time we have to parse the event detail page
+                event_details = get_event_details(event_url)
+                datetime_obj = event_details['datetime_obj']
                 
                 # Extract image if available
                 image_url = ""
@@ -128,7 +153,7 @@ def get_events(username: str, year: str = ""):
                             "country": country
                         }
                     },
-                    "startDate": date_obj.isoformat(),  # Use ISO format string
+                    "startDate": datetime_obj.isoformat(),  # Use ISO format string
                     "description": f"{main_artist} at {venue}",
                     "image": [
                         {"#text": image_url, "size": "small"},
