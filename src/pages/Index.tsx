@@ -138,7 +138,6 @@ const Index = () => {
                 artist={nextEvent.artists.headliner}
                 artists={nextEvent.artists.artist}
                 venue={nextEvent.venue.name}
-                location={nextEvent.venue.location.city}
                 date={nextEvent.startDate}
                 imageUrl={nextEvent.artistImage}
                 url={nextEvent.url}
