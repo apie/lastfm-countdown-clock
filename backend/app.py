@@ -1,8 +1,6 @@
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 from flask_cors import CORS
-import requests
-from bs4 import BeautifulSoup
 from datetime import datetime
 from urllib.parse import quote
 import logging
