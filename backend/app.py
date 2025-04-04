@@ -125,12 +125,11 @@ def get_events(username: str, year: str = ""):
                     logger.warning(f"Failed to extract image for event {i+1}: {str(e)}")
                 
                 # Get the main artist - usually in title or can be parsed from lineup
+                logger.debug('title '+title)
+                logger.debug('lineup '+lineup)
                 main_artist = ""
                 if " - " in title:
                     main_artist = title.split(" - ")[0].strip()
-                elif lineup:
-                    # Try to extract from lineup
-                    main_artist = lineup.split(",")[0].strip()
                 else:
                     # Just use title
                     main_artist = title
