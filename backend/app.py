@@ -136,6 +136,8 @@ def get_events(username: str, year: str = ""):
                 
                 # Get the artist's image from their Last.fm page
                 artist_image_url = get_artist_image(main_artist)
+                if not artist_image_url and lineup:
+                    artist_image_url = get_artist_image(lineup.split(",")[0].strip())
                 
                 # Create standardized event object
                 event_data = {
