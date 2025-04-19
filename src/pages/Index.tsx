@@ -8,7 +8,7 @@ import { Loader2, Music } from 'lucide-react';
 import CountdownTimer from '@/components/CountdownTimer';
 import EventCard from '@/components/EventCard';
 import NoEventsFallback from '@/components/NoEventsFallback';
-import { getUserEvents, getNextEvent } from '@/services/lastfm';
+import { getUserEvents, getNextEvent, LastFMEvent } from '@/services/lastfm';
 
 const Index = () => {
   const { toast } = useToast();
@@ -17,7 +17,7 @@ const Index = () => {
   });
   const [inputUsername, setInputUsername] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [nextEvent, setNextEvent] = useState<any>(null);
+  const [nextEvent, setNextEvent] = useState<LastFMEvent>(null);
   const [allEvents, setAllEvents] = useState<any[]>([]);
 
   const fetchEvents = async (user: string) => {
@@ -139,7 +139,7 @@ const Index = () => {
                 artists={nextEvent.artists.artist}
                 venue={nextEvent.venue.name}
                 date={nextEvent.startDate}
-                imageUrl={nextEvent.artistImage}
+                imageUrl={nextEvent.image || nextEvent.artistImage}
                 url={nextEvent.url}
               />
             </div>

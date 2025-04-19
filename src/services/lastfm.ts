@@ -1,5 +1,5 @@
 
-interface LastFMEvent {
+export interface LastFMEvent {
   id: string;
   title: string;
   artists: {
@@ -15,10 +15,7 @@ interface LastFMEvent {
   };
   startDate: string;
   description: string;
-  image: Array<{
-    '#text': string;
-    size: string;
-  }> | string[];
+  image: string;
   artistImage?: string;
   url: string;
 }

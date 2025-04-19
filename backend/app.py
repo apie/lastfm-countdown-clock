@@ -63,8 +63,18 @@ def get_event_details(event_url: str):
         datetime_obj = datetime.strptime(datetime_attr[:10]+' '+time_str, '%Y-%m-%d %I:%M%p')
     else:
         datetime_obj = datetime.fromisoformat(datetime_attr)
+    # Extract event image if available
+    image_url = ""
+    try:
+        image_elem = r.html.find(".event-expanded-image", first=True)
+        if image_elem:
+            image_url = image_elem.attrs.get("src", "")
+    except Exception as e:
+        logger.warning(f"Failed to extract image for event: {str(e)}")
+
     return dict(
-        datetime_obj=datetime_obj
+        datetime_obj=datetime_obj,
+        image_url=image_url,
     )
 
 def get_events(username: str, year: str = ""):
@@ -114,15 +124,7 @@ def get_events(username: str, year: str = ""):
                 # To get the time we have to parse the event detail page
                 event_details = get_event_details(event_url)
                 datetime_obj = event_details['datetime_obj']
-                
-                # Extract image if available
-                image_url = ""
-                try:
-                    image_elem = event.find("img.events-list-item-image", first=True)
-                    if image_elem:
-                        image_url = image_elem.attrs.get("src", "")
-                except Exception as e:
-                    logger.warning(f"Failed to extract image for event {i+1}: {str(e)}")
+                image_url = event_details['image_url']
                 
                 # Get the main artist - usually in title or can be parsed from lineup
                 logger.debug('title '+title)
@@ -156,12 +158,7 @@ def get_events(username: str, year: str = ""):
                     },
                     "startDate": datetime_obj.isoformat(),  # Use ISO format string
                     "description": f"{main_artist} at {venue}",
-                    "image": [
-                        {"#text": image_url, "size": "small"},
-                        {"#text": image_url, "size": "medium"},
-                        {"#text": image_url, "size": "large"},
-                        {"#text": image_url, "size": "extralarge"}
-                    ],
+                    "image": image_url,
                     "artistImage": artist_image_url,  # New field for artist image
                     "url": link
                 }
