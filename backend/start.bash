@@ -10,5 +10,5 @@ fi
 source venv/bin/activate
 pip install -r requirements.txt
 
-flask run
+flask run --port 5000
 
