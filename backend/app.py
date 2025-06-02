@@ -54,7 +54,8 @@ def get_event_details(event_url: str):
     logger.debug(f"Fetching event details from: {event_url}")
 
     r = session.get(event_url)
-    date_element = r.html.find("p.qa-event-date span", first=True)
+    # Get date span element or first date strong element in case of multi date events.
+    date_element = r.html.find("p.qa-event-date span", first=True) or r.html.find("p.qa-event-date strong", first=True)
     datetime_str = date_element.text
     # This attr incorrectly always contains midnight as time, so try to get the time from the datetime_str if 'at' is in it.
     datetime_attr = date_element.attrs.get('content')
