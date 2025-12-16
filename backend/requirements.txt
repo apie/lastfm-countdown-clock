@@ -24,7 +24,7 @@ pyee==11.1.1
 pyppeteer==2.0.0
 pyproject_hooks==1.2.0
 pyquery==2.0.1
-requests==2.28.2
+requests==2.32.4
 requests-html==0.10.0
 setuptools==78.1.1
 six==1.17.0
