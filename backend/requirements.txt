@@ -93,7 +93,7 @@ w3lib==2.3.1
     # via requests-html
 websockets==10.4
     # via pyppeteer
-werkzeug==3.1.4
+werkzeug==3.1.5
     # via
     #   flask
     #   flask-cors
