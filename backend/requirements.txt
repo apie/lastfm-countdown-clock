@@ -69,7 +69,7 @@ pyproject-hooks==1.2.0
     #   pip-tools
 pyquery==2.0.1
     # via requests-html
-requests==2.32.5
+requests==2.33.0
     # via requests-html
 requests-html==0.10.0
     # via -r requirements.in
