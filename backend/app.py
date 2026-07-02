@@ -85,12 +85,17 @@ def get_events(username: str, year: str = ""):
     logger.info(f"Fetching events for {username}, year: {year if year else 'upcoming'}")
     
     # No year means upcoming events
-    url = f"https://www.last.fm/user/{username}/events/{year}"
+    if year:
+        url = f"https://www.last.fm/user/{username}/events/{year}"
+    else:
+        url = f"https://www.last.fm/user/{username}/events"
     logger.debug(f"Scraping URL: {url}")
     
     events_data = []
     try:
         r = session.get(url)
+        if (r.status_code != 200):
+            logger.debug('Got unknown response: %s', r.status_code)
         events = r.html.find("tr.events-list-item")
         logger.debug(f"Found {len(events)} events in the HTML")
         
