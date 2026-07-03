@@ -28,7 +28,7 @@ cssselect==1.3.0
     # via pyquery
 fake-useragent==2.2.0
     # via requests-html
-flask==3.1.2
+flask==3.1.3
     # via
     #   -r requirements.in
     #   flask-cors
