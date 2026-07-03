@@ -54,7 +54,9 @@ markupsafe==3.0.3
     #   jinja2
     #   werkzeug
 packaging==25.0
-    # via build
+    # via
+    #   build
+    #   wheel
 parse==1.20.2
     # via requests-html
 pip-tools==7.5.2
@@ -97,7 +99,7 @@ werkzeug==3.1.4
     # via
     #   flask
     #   flask-cors
-wheel==0.45.1
+wheel==0.46.2
     # via pip-tools
 zipp==3.23.0
     # via importlib-metadata
