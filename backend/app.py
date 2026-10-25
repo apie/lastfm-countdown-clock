@@ -1,5 +1,4 @@
-from flask import Flask, jsonify
-from flask_cors import CORS
+from flask import Flask, render_template, request
 from datetime import datetime
 from urllib.parse import quote
 import logging
@@ -16,7 +15,6 @@ logger = logging.getLogger(__name__)
 session = HTMLSession()
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
 
 @cache
 def get_artist_image(artist_name):
@@ -104,7 +102,6 @@ def get_events(username: str, year: str = ""):
                 return events_data # return as soon as we have two events. (need more than one since we can have an event today!)
             try:
                 # Extract event data
-                datetimestr = event.find("time", first=True).attrs.get("datetime")
                 link = "https://www.last.fm" + event.find(
                     "a.events-list-cover-link", first=True
                 ).attrs.get("href")
@@ -123,9 +120,6 @@ def get_events(username: str, year: str = ""):
                 # Get venue name (first part of location)
                 venue = city  # Default to city if we can't parse further
                 
-                # Parse the datetime
-                # date_obj = datetime.fromisoformat(datetimestr)
-
                 # To get the time we have to parse the event detail page
                 event_details = get_event_details(event_url)
                 datetime_obj = event_details['datetime_obj']
@@ -180,27 +174,24 @@ def get_events(username: str, year: str = ""):
         logger.error(f"Error fetching events: {str(e)}")
         return []
 
-@app.route('/api/events/<username>', methods=['GET'])
-def get_user_events(username):
-    try:
-        logger.info(f"Fetching events for username: {username}")
-        
-        # URL encode the username properly
-        encoded_username = quote(username)
-        
-        # Use the new scraping function
-        events = get_events(encoded_username)
-        
-        if not events:
-            logger.info(f"No events found for user: {username}")
-            return jsonify({"events": []})
-        
-        logger.info(f"Successfully retrieved {len(events)} events for {username}")
-        return jsonify({"events": events})
-    
-    except Exception as e:
-        logger.error(f"Error in get_user_events: {str(e)}")
-        return jsonify({"error": str(e), "events": []}), 500
+def get_next_event(events):
+    """Return the soonest event that starts in the future, or None."""
+    now = datetime.now()
+    future = [e for e in events if datetime.fromisoformat(e["startDate"]) > now]
+    return min(future, key=lambda e: e["startDate"], default=None)
+
+@app.route('/')
+def index():
+    return render_template('index.html', username=request.args.get('username', ''))
+
+@app.route('/events')
+def events_partial():
+    """htmx partial: countdown and event card for the given username."""
+    username = request.args.get('username', '').strip()
+    if not username:
+        return render_template('_result.html', error="Please enter a Last.fm username")
+    event = get_next_event(get_events(quote(username)))
+    return render_template('_result.html', event=event, username=username)
 
 if __name__ == '__main__':
     logger.info("Starting Flask application")
