@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 from datetime import datetime
 from urllib.parse import quote
@@ -179,6 +179,25 @@ def get_events(username: str, year: str = ""):
     except Exception as e:
         logger.error(f"Error fetching events: {str(e)}")
         return []
+
+def get_next_event(events):
+    """Return the soonest event that starts in the future, or None."""
+    now = datetime.now()
+    future = [e for e in events if datetime.fromisoformat(e["startDate"]) > now]
+    return min(future, key=lambda e: e["startDate"], default=None)
+
+@app.route('/')
+def index():
+    return render_template('index.html', username=request.args.get('username', ''))
+
+@app.route('/events')
+def events_partial():
+    """htmx partial: countdown and event card for the given username."""
+    username = request.args.get('username', '').strip()
+    if not username:
+        return render_template('_result.html', error="Please enter a Last.fm username")
+    event = get_next_event(get_events(quote(username)))
+    return render_template('_result.html', event=event, username=username)
 
 @app.route('/api/events/<username>', methods=['GET'])
 def get_user_events(username):
